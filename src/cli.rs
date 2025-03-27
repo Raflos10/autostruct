@@ -7,6 +7,7 @@ use crate::generator::{self};
 pub enum Framework {
     None,
     Sqlx,
+    Serde,
 }
 
 impl Default for Framework {
@@ -76,6 +77,7 @@ impl TryInto<generator::Arguments> for GenerateArgs {
             framework: match self.framework {
                 Framework::None => generator::Framework::None,
                 Framework::Sqlx => generator::Framework::Sqlx,
+                Framework::Serde => generator::Framework::Serde,
             },
         };
 

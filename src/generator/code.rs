@@ -64,6 +64,9 @@ impl Generator {
                 let macros = match self.options.framework {
                     Framework::None => "#[derive(Debug, Clone, PartialEq, Eq)]\n",
                     Framework::Sqlx => "#[derive(Debug, Clone, PartialEq, Eq, sqlx::Type)]\n",
+                    Framework::Serde => {
+                        "#[derive(Debug, Deserialize, Clone, PartialEq, Serialize)]\n"
+                    }
                 };
 
                 snippet.code.push_str(macros);
@@ -90,6 +93,9 @@ impl Generator {
                 let macros = match self.options.framework {
                     Framework::None => "#[derive(Debug, Clone)]\n",
                     Framework::Sqlx => "#[derive(Debug, Clone, sqlx::Type)]\n",
+                    Framework::Serde => {
+                        "#[derive(Debug, Deserialize, Clone, PartialEq, Serialize)]\n"
+                    }
                 };
                 snippet.code.push_str(macros);
                 snippet
@@ -190,6 +196,11 @@ impl Generator {
                 snippet
                     .code
                     .push_str("#[derive(Debug, Clone, sqlx::FromRow)]\n");
+            }
+            Framework::Serde => {
+                snippet
+                    .code
+                    .push_str("#[derive(Debug, Deserialize, Clone, PartialEq, Serialize)]\n");
             }
         }
     }

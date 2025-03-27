@@ -8,13 +8,15 @@ use tokio::{
 };
 
 use super::{
-    code::{self, Options}, utils,
+    code::{self, Options},
+    utils,
 };
 
 #[derive(Clone, Debug)]
 pub enum Framework {
     None,
     Sqlx,
+    Serde,
 }
 
 impl Default for Framework {
@@ -104,7 +106,7 @@ pub async fn run(args: Arguments) -> Result<(), Error> {
     for snippet in code_snippets {
         let file_name = snippet.id.to_snake_case();
         module_names.push((file_name.clone(), snippet.id.to_pascal_case()));
-        
+
         let source_file = output_dir.join(format!("{file_name}.rs"));
         let mut code = String::new();
         code.push_str(
@@ -121,8 +123,10 @@ pub async fn run(args: Arguments) -> Result<(), Error> {
 
     // Generate mod.rs with public module declarations
     let mod_file_path = output_dir.join("mod.rs");
-    let mut mod_contents = String::from("// Generated with autostruct\n// https://github.com/sound-systems/autostruct\n\n");
-    
+    let mut mod_contents = String::from(
+        "// Generated with autostruct\n// https://github.com/sound-systems/autostruct\n\n",
+    );
+
     for module_name in module_names {
         mod_contents.push_str(&format!("mod {};\n", module_name.0));
         mod_contents.push_str(&format!("pub use {}::{};\n", module_name.0, module_name.1));
@@ -131,7 +135,8 @@ pub async fn run(args: Arguments) -> Result<(), Error> {
     let mut mod_file = File::create(mod_file_path)
         .await
         .context("failed to create mod.rs file")?;
-    mod_file.write_all(mod_contents.as_bytes())
+    mod_file
+        .write_all(mod_contents.as_bytes())
         .await
         .context("failed to write mod.rs contents")?;
 
